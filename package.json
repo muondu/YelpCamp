@@ -1,7 +1,7 @@
 {
   "name": "yelpcamp",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is a trial project from my Udemy Course",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,15 @@
   "dependencies": {
     "ejs": "^3.1.8",
     "express": "^4.18.2",
-    "mongoose": "^6.9.0"
-  }
+    "mongoose": "^6.9.0",
+    "nodemon": "^2.0.20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muondu/YelpCamp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/muondu/YelpCamp/issues"
+  },
+  "homepage": "https://github.com/muondu/YelpCamp#readme"
 }
