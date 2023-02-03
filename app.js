@@ -30,8 +30,9 @@ app.get('/', async (req, res) => {
     res.send(camp)
 })
 
-app.get('/makecampground', (req, res) => {
-    res.render('home')
+app.get('/makecampground', async (req, res) => {
+    const campgrounds = await Campground.find({});
+    res.render('campgrounds/index', {campgrounds})
 })
 
 // Tells express port to go to
