@@ -6,6 +6,7 @@ const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const { render } = require('ejs');
+const { response } = require('express');
 // Connecting Mongoose DB to app.js
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser:true,
@@ -54,18 +55,15 @@ app.get('/campgrounds/:id', async(req, res) => {
 
 
 
-app.post('/campgrounds', async(req, res) => {
+app.post('/campgrounds', async(req, res, next) => {
+    try{
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/camp/${campground._id}`)
+    } catch(e){
+        next(e);
+    }
 })
-
-// Takes you to edit campground
-app.get('/campground/:id/edit', async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
-    res.render('camgrounds/edit', {campground});
-})
-
 // Tells express port to go to
 app.listen(3000, ()=> {
     console.log('Serving on pot 3000')
@@ -84,3 +82,13 @@ app.delete('/campground/id', async (req, res) => {
     res.redirect('/campgrounds');
     
 })
+
+app.use((err, req, res, next) => {
+    res.send('Oh Boy')
+})
+// Takes you to edit campground
+app.get('/campground/:id/edit', async (req, res) => {
+    const campground = await Campground.findById(req.params.id)
+    res.render('camgrounds/edit', {campground});
+})
+
