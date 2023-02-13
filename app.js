@@ -11,6 +11,7 @@ const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const { render } = require('ejs');
 const { response } = require('express');
+const Review = require('./models/review');
 // Connecting Mongoose DB to app.js
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser:true,
@@ -67,7 +68,15 @@ app.get('/campgrounds/:id', catchAsync( async(req, res) => {
     res.render('campgrounds/show',{campground});
 }));
 
+app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review)
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground.__id}`);
 
+}))
 
 app.post('/campgrounds', validateCampground, catchAsync( async(req, res, next) => {
     // if(!req.body.camground) throw new ExpressError('Invalid Campground Data', 400)
@@ -115,3 +124,4 @@ app.use((err, req, res, next) => {
 app.listen(3000, ()=> {
     console.log('Serving on pot 3000')
 })
+
