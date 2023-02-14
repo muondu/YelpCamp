@@ -88,6 +88,13 @@ app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res)
 
 }))
 
+app.delete('/camgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
+    const {id, reviewId} = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
+}))
+
 app.post('/campgrounds', validateCampground, catchAsync( async(req, res, next) => {
     // if(!req.body.camground) throw new ExpressError('Invalid Campground Data', 400)
     const campground = new Campground(req.body.campground);
