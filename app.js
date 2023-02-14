@@ -3,17 +3,12 @@ const express = require('express');
 const path = require('path');
 const mongoose  = require("mongoose");
 const ejsMate = require('ejs-mate');
-const Joi = require('joi');
-const {campgroundSchema, reviewSchema} = require('./schema.js');
-const catchAsync = require('./utils/catchAsync');
-const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
-const Campground = require('./models/campground');
-const { render } = require('ejs');
-const { response } = require('express');
-const Review = require('./models/review');
-
+const ExpressError = require('./utils/ExpressError');
+// Connecting all my routes
 const campgrounds = require('./routes/campgrounds');
+const reviews = require('./routes/reviews');
+
 
 // Connecting Mongoose DB to app.js
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -40,15 +35,6 @@ app.use(methodOverride('__method'));
 
 
 
-const validateReview = (req, res, next) => {
-    const {error} = campgroundSchema.validate(req.body);
-    if(error){
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else{
-        next();
-    }
-}
 
 // Takes the page to home.ejs
 app.get('/', async (req, res) => {
@@ -61,24 +47,10 @@ app.get('/', async (req, res) => {
 
 
 app.use('/campgrounds', campgrounds)
+app.use('/campgrounds/:id/reviews', reviews)
 
 
-app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review)
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground.__id}`);
 
-}))
-
-app.delete('/camgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
-    const {id, reviewId} = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
 
 
 
