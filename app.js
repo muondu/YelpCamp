@@ -6,6 +6,7 @@ const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const session = require('express-session'); 
 const ExpressError = require('./utils/ExpressError');
+const flash = require('connect-flash');
 // Connecting all my routes
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
@@ -58,6 +59,13 @@ const sessionConfig = {
     }
 }
 app.use(session())
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
 
 app.use('/campgrounds', campgrounds)
 app.use('/campgrounds/:id/reviews', reviews)
