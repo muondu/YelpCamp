@@ -47,6 +47,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">"Rating <%= review.rating %></h5>
+                    <h6 class="class-subtitle mb-2 text-muted">By <%= review.author.username%></h6>
                     <p class="card-text">Review <%= review.body %></p>
                     <form action="/campgrounds/<%=campground._id %>/reviews/<%= review._id%>?_method=DELETE" method="POST">
                         <button class="btn btn-sm btn-danger">Delete</button>
