@@ -5,28 +5,31 @@ const catchAsync = require('../utils/catchAsync');
 const {isLoggedIn, isAuthor, validateCampground} = require('../middleware');
 
 const Campground = require('../models/campground');
-const campground = require('../models/campground');
 
+router.route('/')
+    .get(catchAsync(camgrounds.index))
+    .post(isLoggedIn, validateCampground, catchAsync(camgrounds.createCampground));
 
-
-
-router.get('/',catchAsync(camgrounds.index));
-
-// Takes you to creating new campground
 router.get('/new', isLoggedIn, campgrounds.renderNewForm);
 
-router.post('/', validateCampground, catchAsync(camgrounds.createCampground));
 
-// Shows the campground
-router.get('/:id',catchAsync(camgrounds.showCampground));
+router.route('/:id')
+    // Shows the campground
+    .get(catchAsync(camgrounds.showCampground))
+    // Used to update Campground
+    .put(isLoggedIn ,isAuthor, validateCampground, catchAsync(campgrounds.updateCampground))
+    // Used to delete campground
+    .delete(isAuthor ,isLoggedIn,catchAsync(camgrounds.deleteCampground))
+
+
+
+// Takes you to creating new campground
+
+
 
 // Takes you to edit campground
 router.get('/:id/edit', isLoggedIn , isAuthor, catchAsync(camgrounds.renderEditForm));
-// Used to update Campground
-router.put(':id',  isLoggedIn ,isAuthor, validateCampground, catchAsync(campgrounds.updateCampground));
 
 
-// Used to delete campground
-router.delete('/:id', isAuthor ,isLoggedIn,catchAsync(camgrounds.deleteCampground));
 
 module.exports = router;   
