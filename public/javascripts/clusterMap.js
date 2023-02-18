@@ -1,3 +1,5 @@
+const { text } = require("express");
+
 mapboxgl.accessToken = mapToken;
 const map = new mapboxgl.Map({
     container: 'map',
@@ -85,27 +87,24 @@ map.on('load', () => {
         });
         const clusterId = features[0].properties.cluster_id;
         map.getSource('campgrounds').getClusterExpansionZoom(
-        clusterId,
-        (err, zoom) => {
-        if (err) return;
+            clusterId,
+            (err, zoom) => {
+                if (err) return;
         
-        map.easeTo({
-        center: features[0].geometry.coordinates,
-        zoom: zoom
-        });
-        }
+            map.easeTo({
+            center: features[0].geometry.coordinates,
+            zoom: zoom
+                });
+                }
         );
     });
-    
-    // When a click event occurs on a feature in
-    // the unclustered-point layer, open a popup at
-    // the location of the feature, with
-    // description HTML from its properties.
+ 
+
     map.on('click', 'unclustered-point', (e) => {
+
+        const {popUpMarkup} = e.features[0].properties;
         const coordinates = e.features[0].geometry.coordinates.slice();
-        const mag = e.features[0].properties.mag;
-        const tsunami =
-        e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
+       
         
         // Ensure that if the map is zoomed out such that
         // multiple copies of the feature are visible, the
@@ -116,9 +115,7 @@ map.on('load', () => {
         
         new mapboxgl.Popup()
         .setLngLat(coordinates)
-        .setHTML(
-        `magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`
-        )
+        .setHTML(popUpMarkup)
         .addTo(map);
     });
     
