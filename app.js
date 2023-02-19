@@ -52,12 +52,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 
-// Takes the page to home.ejs
-app.get('/', async (req, res) => {
-    const camp = new Campground({title:'Frontyard', description:'Cheap'});
-    await camp.save();
-    res.send(camp)
-})
 
 
 const sessionConfig = {
@@ -100,6 +94,10 @@ app.use('/campgrounds/:id/reviews', reviewRoutes)
 
 
 
+// Takes the page to home.ejs
+app.get('/', req, res => {
+    res.send('home')
+})
 
 
 
