@@ -7,10 +7,10 @@ console.log(process.env.API_KEY)
 
 const express = require('express');
 const path = require('path');
-const mongoose  = require("mongoose");
+const mongoose = require("mongoose");
 const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
-const session = require('express-session'); 
+const session = require('express-session');
 const ExpressError = require('./utils/ExpressError');
 const flash = require('connect-flash');
 const passport = require('passport');
@@ -22,11 +22,11 @@ const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 const MongoDBStore = require("connect-mongo")(session);
-const dbUrl = 'mongodb:localhost:27017/yelp-camp';
+const dbUrl = process.env.DB_URL || 'mongodb:localhost:27017/yelp-camp';
 
 // Connecting Mongoose DB to app.js
 mongoose.connect(dbUrl, {
-    useNewUrlParser:true,
+    useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
     useFindAndModify: false
@@ -45,18 +45,19 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({
+    extended: true
+}));
 app.use(methodOverride('__method'));
-app.use(express.static(path.join(__dirname, 'public')))
 app.use(mongoSanitize());
 
 
 
-
+const secret = process.env.SECRET || 'thisshouldbeasecret!';
 
 const store = new MongoDBStore({
     url: dbUrl,
-    secret: 'thisshouldbeasecret!',
+    secret,
     touchAfter: 24 * 60 * 60
 });
 
@@ -67,7 +68,7 @@ store.on("error", function (e) {
 const sessionConfig = {
     store,
     name: 'session',
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -97,7 +98,10 @@ app.use((req, res, next) => {
 })
 
 app.get('/fakeUser', async (req, res) => {
-    const user = new User({ email:'munenemuondu@gmail.com', username:'NeroNesh' })
+    const user = new User({
+        email: 'munenemuondu@gmail.com',
+        username: 'NeroNesh'
+    })
     const newUser = await User.register(user, 'chicken')
     res.send(newUser);
 })
@@ -124,14 +128,17 @@ app.all('*', (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    const {statusCode = 500, message = 'Something went wrong'} = err;
+    const {
+        statusCode = 500, message = 'Something went wrong'
+    } = err;
     if (!err.message) err.message = 'Oh No, Something went wrong'
-    res.status(statusCode).render('error',{ err });
+    res.status(statusCode).render('error', {
+        err
+    });
 })
 
 
 // Tells express port to go to
-app.listen(3000, ()=> {
+app.listen(3000, () => {
     console.log('Serving on pot 3000')
 })
-
